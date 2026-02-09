@@ -32,7 +32,8 @@ export class FastifyApp {
           },
         },
       },
-      disableRequestLogging: process.env.NODE_ENV === "production",
+      // 禁用Fastify的默认请求日志，使用我们的自定义日志
+      disableRequestLogging: true,
     });
 
     this.pluginManager = new PluginManager(this.app);
