@@ -46,11 +46,15 @@ export class FastifyApp {
     // 添加请求ID装饰器
     this.app.decorateRequest("requestId", "");
 
+    // 添加请求开始时间装饰器
+    this.app.decorateRequest("startTime", 0);
+
     // 添加请求日志装饰器
     this.app.addHook(
       "onRequest",
       async (request: FastifyRequest, reply: FastifyReply) => {
         request.requestId = Math.random().toString(36).substring(2, 15);
+        request.startTime = Date.now();
 
         this.app.log.info(`请求开始: ${request.method} ${request.url}`, {
           requestId: request.requestId,
@@ -64,12 +68,14 @@ export class FastifyApp {
     this.app.addHook(
       "onResponse",
       async (request: FastifyRequest, reply: FastifyReply) => {
+        const responseTime = Date.now() - request.startTime;
+
         this.app.log.info(
           `请求完成: ${request.method} ${request.url} - ${reply.statusCode}`,
           {
             requestId: request.requestId,
             statusCode: reply.statusCode,
-            responseTime: reply.getResponseTime(),
+            responseTime: `${responseTime}ms`,
           },
         );
       },
